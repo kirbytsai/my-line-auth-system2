@@ -21,3 +21,14 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+# Vercel
+.vercel
+
+# Environment
+.env.local
+.env.production
+
+# MongoDB
+*.log

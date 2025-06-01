@@ -1,70 +1,147 @@
-# Getting Started with Create React App
+# LINE Auth System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+一個整合 LINE Bot 與多服務認證的學習專案，實作 Token + Session 混合認證方案。
 
-## Available Scripts
+## 專案特色
 
-In the project directory, you can run:
+- 🤖 LINE Bot 整合多服務（MyPage、MyMile）
+- 🔐 JWT Token + MongoDB Session 混合認證
+- ⚡ Serverless 架構（Vercel Functions）
+- 📱 網路品質差環境優化
+- 🔄 跨服務 Session 共享
 
-### `npm start`
+## 快速開始
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### 前置需求
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Node.js 16+
+- MongoDB Atlas 帳號
+- Vercel 帳號
+- LINE Developers 帳號
 
-### `npm test`
+### 安裝步驟
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Clone 專案
+```bash
+git clone https://github.com/your-username/my-line-auth-system.git
+cd my-line-auth-system
+```
 
-### `npm run build`
+2. 安裝依賴
+```bash
+npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. 環境變數設定
+```bash
+cp .env.example .env.local
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+編輯 `.env.local`：
+```
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+LINE_CHANNEL_SECRET=your_line_channel_secret
+LINE_CHANNEL_ACCESS_TOKEN=your_line_channel_access_token
+FRONTEND_URL=http://localhost:3000
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+4. 本地開發
+```bash
+# 開發模式（前端 + Vercel Functions）
+npm run dev
 
-### `npm run eject`
+# 前端：http://localhost:3000
+# API：http://localhost:3000/api
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 專案架構
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+my-line-auth-system/
+├── src/                    # React 前端
+│   ├── components/         # 頁面元件
+│   ├── hooks/             # 自定義 Hooks
+│   └── services/          # API 呼叫
+├── api/                   # Vercel Functions
+│   ├── auth/             # 認證相關
+│   ├── mypage/           # MyPage 服務
+│   └── mymile/           # MyMile 服務
+├── lib/                  # 共用程式庫
+│   ├── jwt.js           # Token 處理
+│   ├── mongodb.js       # 資料庫連線
+│   └── session.js       # Session 管理
+└── docs/                # 詳細文件
+    └── ARCHITECTURE.md  # 架構設計
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 認證流程
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+LINE Bot 選單點擊
+    ↓
+Bot 回傳個人化連結（含時間戳記簽名）
+    ↓
+/api/auth/redirect 驗證簽名
+    ↓
+建立 MongoDB Session
+    ↓
+跳轉至前端路由（帶 Session Token）
+    ↓
+前端使用 Token 存取 API
+```
 
-## Learn More
+## 主要功能
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **LINE Bot Rich Menu**：提供服務入口
+- **個人化安全連結**：時間戳記簽名防護
+- **自動登入**：點擊連結直接登入
+- **跨服務 Session**：MyPage 登入後，MyMile 也是登入狀態
+- **網路優化**：支援離線快取、漸進式載入
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## API 端點
 
-### Code Splitting
+| 端點 | 方法 | 說明 |
+|------|------|------|
+| `/api/auth/redirect` | GET | 認證中介服務 |
+| `/api/mypage/profile` | GET | 取得 MyPage 個人資料 |
+| `/api/mymile/data` | GET | 取得 MyMile 資料 |
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 部署
 
-### Analyzing the Bundle Size
+### Vercel 部署
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. 安裝 Vercel CLI
+```bash
+npm i -g vercel
+```
 
-### Making a Progressive Web App
+2. 部署
+```bash
+vercel
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+3. 設定環境變數
+在 Vercel Dashboard 中設定 Production 環境變數
 
-### Advanced Configuration
+### LINE Bot 設定
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. 在 LINE Developers Console 設定 Webhook URL
+2. 建立 Rich Menu 並設定 Postback Action
+3. 連結 Rich Menu 到 Bot
 
-### Deployment
+## 開發指南
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- 遵循 [Conventional Commits](https://www.conventionalcommits.org/)
+- 執行測試：`npm test`
+- 程式碼檢查：`npm run lint`
 
-### `npm run build` fails to minify
+## 相關文件
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- [架構設計文件](./docs/ARCHITECTURE.md)
+- [API 文件](./docs/API.md)
+- [部署指南](./docs/DEPLOYMENT.md)
+
+## 授權
+
+MIT License
