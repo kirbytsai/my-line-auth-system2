@@ -29,6 +29,15 @@ yarn-error.log*
 # Environment
 .env.local
 .env.production
+# 環境變數
+.env.local
+.env.development.local
+.env.production.local
+.env
+
+# 但這兩個可以提交
+# .env.development
+# .env.production
 
 # MongoDB
 *.log
