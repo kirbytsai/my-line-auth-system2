@@ -3,12 +3,12 @@
  * 處理從 LINE Bot 來的認證請求
  */
 
-import { verifyShortToken } from '../../lib/jwt.js';
-import { createSession } from '../../lib/session.js';
-import { getCollection } from '../../lib/mongodb.js';
-import { ERROR_MESSAGES, HTTP_STATUS, SERVICES } from '../../lib/constants.js';
+const { verifyShortToken } = require('../../lib/jwt.js');
+const { createSession } = require('../../lib/session.js');
+const { getCollection } = require('../../lib/mongodb.js');
+const { ERROR_MESSAGES, HTTP_STATUS, SERVICES } = require('../../lib/constants.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // 只接受 GET 請求
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -32,13 +32,14 @@ export default async function handler(req, res) {
     }
 
     // 解構 payload
-    const { u: userId, s: service, t: timestamp, n: nonce } = payload;
+    const { userId, service, t: timestamp, n: nonce } = payload;
     
     console.log('Token 驗證成功:', { userId, service, timestamp });
 
-    // 驗證服務名稱
-    const validServices = Object.values(SERVICES);
+    // 驗證服務名稱（直接定義，避免模組載入問題）
+    const validServices = ['mypage', 'mymile'];
     if (!validServices.includes(service)) {
+      console.log('無效的服務名稱:', service);
       return res.redirect(302, `${process.env.FRONTEND_URL}/error?msg=invalid_service`);
     }
 
@@ -122,13 +123,4 @@ export default async function handler(req, res) {
     // 錯誤時跳轉到錯誤頁面
     res.redirect(302, `${process.env.FRONTEND_URL}/error?msg=server_error`);
   }
-}
-
-/**
- * Vercel 設定
- */
-export const config = {
-  api: {
-    bodyParser: false, // 不需要 body parser
-  },
 };
