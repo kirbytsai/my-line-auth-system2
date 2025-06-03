@@ -11,6 +11,10 @@ const channelAccessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 
 // 驗證 LINE 簽名
 function validateSignature(body, signature) {
+  if (!signature) {
+    return false;
+  }
+  
   const hash = crypto
     .createHmac('SHA256', channelSecret)
     .update(body)
@@ -110,6 +114,12 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // 檢查是否有必要的環境變數
+  if (!channelSecret || !channelAccessToken) {
+    console.error('缺少 LINE 環境變數設定');
+    return res.status(500).json({ error: 'Server configuration error' });
+  }
+
   // 取得請求內容
   const body = JSON.stringify(req.body);
   const signature = req.headers['x-line-signature'];
@@ -124,8 +134,20 @@ module.exports = async function handler(req, res) {
   try {
     const { events } = req.body;
     
+    // LINE Verify 會發送空的 events 陣列
+    if (!events || events.length === 0) {
+      console.log('收到驗證請求或空事件');
+      return res.status(200).json({ success: true });
+    }
+    
     for (const event of events) {
       console.log('收到事件:', event.type);
+      
+      // 如果是 Webhook 驗證事件，直接回應 200
+      if (event.replyToken === '00000000000000000000000000000000' || 
+          event.replyToken === 'ffffffffffffffffffffffffffffffff') {
+        continue;
+      }
       
       switch (event.type) {
         case 'message':
