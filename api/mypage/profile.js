@@ -3,11 +3,11 @@
  * 取得用戶個人資料
  */
 
-import { verifySession, canAccessService } from '../../lib/session.js';
-import { getCollection } from '../../lib/mongodb.js';
-import { ERROR_MESSAGES, HTTP_STATUS, SERVICES } from '../../lib/constants.js';
+const { verifySession, canAccessService } = require('../../lib/session.js');
+const { getCollection } = require('../../lib/mongodb.js');
+const { ERROR_MESSAGES, HTTP_STATUS, SERVICES } = require('../../lib/constants.js');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // 設定 CORS
   res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_URL || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -97,4 +97,4 @@ export default async function handler(req, res) {
       code: 'INTERNAL_ERROR',
     });
   }
-}
+};

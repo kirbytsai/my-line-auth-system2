@@ -4,12 +4,15 @@ import './App.css';
 import Home from './components/Home';
 import MyPage from './components/MyPage';
 import MyMile from './components/MyMile';
+import LiffEntry from './components/LiffEntry';
+
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
+          <Route path="/liff" element={<LiffEntry />} />  
           <Route path="/" element={<Home />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/mymile" element={<MyMile />} />
