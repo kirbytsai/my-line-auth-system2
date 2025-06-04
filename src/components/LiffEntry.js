@@ -14,10 +14,23 @@ function LiffEntry() {
 
   const initializeLiff = async () => {
     try {
+      console.log('開始初始化 LIFF...');
+      console.log('LIFF ID:', process.env.REACT_APP_LIFF_ID);
+      
+      // 檢查 LIFF SDK 是否載入
+      if (!liff) {
+        throw new Error('LIFF SDK 未載入');
+      }
+      
       // 初始化 LIFF
       await liff.init({ 
-        liffId: process.env.REACT_APP_LIFF_ID // 需要在環境變數設定
+        liffId: process.env.REACT_APP_LIFF_ID,
+        withLoginOnExternalBrowser: true, // 允許外部瀏覽器登入
       });
+      
+      console.log('LIFF 初始化成功');
+      console.log('是否在 LINE 內:', liff.isInClient());
+      console.log('是否已登入:', liff.isLoggedIn());
 
       // 檢查是否已登入 LINE
       if (!liff.isLoggedIn()) {
