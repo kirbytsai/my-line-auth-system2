@@ -51,9 +51,22 @@ function MyMile() {
       // 4. 設定已認證（暫時使用假資料）
       setAuthenticated(true);
       
+      // 先嘗試從快取取得用戶資料（包含頭像）
+      const cachedProfile = localStorage.getItem('userProfile');
+      let userProfile = null;
+      if (cachedProfile) {
+        try {
+          userProfile = JSON.parse(cachedProfile);
+        } catch (e) {
+          console.error('解析快取資料失敗:', e);
+        }
+      }
+      
       // 模擬 MyMile 資料
       setMileData({
-        userId: 'U123456789',
+        userId: userProfile?.userId || 'U123456789',
+        userName: userProfile?.profile?.name || '用戶',
+        userAvatar: userProfile?.profile?.avatar || null,
         currentMiles: 12500,
         level: 'Gold',
         expireDate: '2025-12-31',
@@ -132,6 +145,34 @@ function MyMile() {
           width: '100%',
         }}>
           <h2>里程總覽</h2>
+          
+          {/* 顯示用戶頭像和名稱 */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '1rem',
+            marginBottom: '1rem'
+          }}>
+            {mileData.userAvatar && (
+              <img 
+                src={mileData.userAvatar} 
+                alt="用戶頭像"
+                style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  border: '2px solid #f093fb'
+                }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            )}
+            <div style={{ fontSize: '1.2rem' }}>
+              {mileData.userName}
+            </div>
+          </div>
           
           <div style={{ 
             fontSize: '3rem', 

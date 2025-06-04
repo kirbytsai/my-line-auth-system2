@@ -147,6 +147,30 @@ function MyPage() {
         }}>
           <h2>👤 個人資料</h2>
           
+          {/* 顯示用戶頭像 */}
+          {profile.profile.avatar && (
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'center',
+              marginBottom: '1rem' 
+            }}>
+              <img 
+                src={profile.profile.avatar} 
+                alt="用戶頭像"
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  borderRadius: '50%',
+                  border: '3px solid #61dafb',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
+          
           <div style={{ textAlign: 'left', marginTop: '1rem' }}>
             <p><strong>用戶 ID：</strong>{profile.userId}</p>
             <p><strong>名稱：</strong>{profile.profile.name}</p>
