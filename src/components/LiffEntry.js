@@ -69,18 +69,12 @@ function LiffEntry() {
       localStorage.setItem('sessionToken', data.sessionToken);
       localStorage.setItem('sessionExpiresAt', data.expiresAt);
       
-      // 關閉 LIFF 並跳轉到目標服務
+      // 根據環境決定跳轉方式
       if (liff.isInClient()) {
-        // 在 LINE 內開啟外部瀏覽器
-        liff.openWindow({
-          url: `${window.location.origin}/${service}?auth=${data.sessionToken}`,
-          external: true,
-        });
-        
-        // 關閉 LIFF
-        liff.closeWindow();
+        // 在 LINE 內直接跳轉（不開外部瀏覽器）
+        window.location.href = `/${service}?auth=${data.sessionToken}`;
       } else {
-        // 直接跳轉
+        // 在外部瀏覽器直接跳轉
         navigate(`/${service}?auth=${data.sessionToken}`);
       }
 
