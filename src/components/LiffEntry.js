@@ -58,11 +58,12 @@ function LiffEntry() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('認證失敗');
-      }
-
       const data = await response.json();
+      
+      if (!response.ok) {
+        console.error('API 錯誤回應:', data);
+        throw new Error(data.message || data.error || '認證失敗');
+      }
       
       // 儲存 Session Token
       localStorage.setItem('sessionToken', data.sessionToken);

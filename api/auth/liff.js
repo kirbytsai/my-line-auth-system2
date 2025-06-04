@@ -49,13 +49,35 @@ async function verifyIdToken(idToken) {
 }
 
 module.exports = async function handler(req, res) {
+  // 設定 CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // 處理 OPTIONS 請求
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   // 只接受 POST 請求
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // 檢查環境變數
+  if (!process.env.LINE_CHANNEL_ID) {
+    console.error('缺少 LINE_CHANNEL_ID 環境變數');
+    return res.status(500).json({ error: '伺服器設定錯誤' });
+  }
+
   try {
     const { idToken, profile, service } = req.body;
+    
+    console.log('收到 LIFF 認證請求:', { 
+      hasIdToken: !!idToken, 
+      profile: profile?.displayName,
+      service 
+    });
 
     // 驗證 ID Token
     const tokenData = await verifyIdToken(idToken);
@@ -134,6 +156,14 @@ module.exports = async function handler(req, res) {
 
   } catch (error) {
     console.error('LIFF 認證錯誤:', error);
-    res.status(500).json({ error: '認證失敗' });
+    console.error('錯誤詳情:', error.message);
+    console.error('錯誤堆疊:', error.stack);
+    
+    res.status(500).json({ 
+      error: '認證失敗',
+      message: error.message,
+      // 開發環境顯示詳細錯誤
+      ...(process.env.NODE_ENV === 'development' && { stack: error.stack })
+    });
   }
 };
